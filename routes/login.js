@@ -1,9 +1,9 @@
 import express from "express"
-import db from '../utils/db.js';
+import db from '../utils/db.js'
 
 const router = express.Router()
 
-router.post('/Login',(req,res)=>{
+router.post('/Login', (req, res) => {
     const sentloginUserName = req.body.LoginuserName
     const sentloginPassword = req.body.Loginpassword
 
@@ -13,11 +13,15 @@ router.post('/Login',(req,res)=>{
 
     db.query(SQL, Values, (err, results) => {
         if (err) {
-            res.status(500).send({ error: 'Internal Server Error' });
-        } else if (results.length > 0) {
-            res.send(results);
-        } else {
-            res.status(401).send({ message: "Credentials Don't match!" });
+            res.send({error: err})
+        }
+        if (results.length > 0) {
+            res.send(results)
+            console.log('Login successfull!')
+        }
+        else {
+            res.send({message: "Credentials Don't Match!"})
+            console.log("Credentials Don't Match!")
         }
     })
 
