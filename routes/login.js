@@ -1,9 +1,9 @@
-import express from "express"
-import db from '../utils/db.js'
+const express = require('express')
+const db = require('../database/connection.js')
 
-const router = express.Router()
+const loginRouter = express.Router()
 
-router.post('/Login', (req, res) => {
+loginRouter.post('/Login', (req, res) => {
     const sentloginUserName = req.body.LoginuserName
     const sentloginPassword = req.body.Loginpassword
 
@@ -27,4 +27,4 @@ router.post('/Login', (req, res) => {
 
 })
 
-export {router as loginRouter}
+module.exports = loginRouter
