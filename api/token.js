@@ -28,19 +28,19 @@ async function APISignIn() {
     return res.data.data.token
 }
 
-async function tokenCheck(EndPoint) {
-  const _token = await APISignIn();
-  const _res = await axios.post(
-    `${BaseURL}${EndPoint}`,
-    { page_index: 1, page_size: 10 },
-    {
-      headers: {
-        token: _token,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  return _res
-}
+// async function tokenCheck(EndPoint) {
+//   const _token = await APISignIn();
+//   const _res = await axios.post(
+//     `${BaseURL}${EndPoint}`,
+//     { page_index: 1, page_size: 10 },
+//     {
+//       headers: {
+//         token: _token,
+//         "Content-Type": "application/json",
+//       },
+//     }
+//   );
+//   return _res
+// }
 
-module.exports = { APISignIn, tokenCheck }
+module.exports = { APISignIn }

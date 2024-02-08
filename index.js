@@ -3,7 +3,7 @@ const http = require('http');
 const cors = require("cors");
 require("dotenv").config();
 const { APISignIn } = require("./api/token.js");
-const { _GetUserPlantList } = require("./api/functions.js");
+const { _GetUserPlantList, getUserPlantDataById } = require("./api/functions.js");
 const { initializeWebSocket } = require('./sockets/socketsHandler.js');
 const { insertDataIntoDatabase } = require('./database/getplants.js');
 
@@ -24,7 +24,7 @@ app.use("/", loginRouter);
 
 const BaseURL= process.env.BaseURL
 const GetUserPlantList= process.env.GetUserPlantList
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 5001;
 
 // Initialize WebSocket
 initializeWebSocket(server);
@@ -62,6 +62,16 @@ app.get("/plants", async (req, res) => {
   try {
     const _res = await _GetUserPlantList();
     res.json({ plants: _res.data.data.list });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/plantsdata", async (req, res) => {
+  try {
+    const _res = await getUserPlantDataById("20ea0232-0b26-43e2-833b-36fff0ac28a1");
+    res.json({ plants: _res.data });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

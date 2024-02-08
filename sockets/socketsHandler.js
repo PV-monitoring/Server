@@ -9,7 +9,7 @@ function initializeWebSocket(server) {
   const httpServer = http.createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: 'http://localhost:3000', // client's origin
+      origin: 'http://localhost:5000', // client's origin
       methods: ['GET', 'POST'],
   },
 });
@@ -34,8 +34,8 @@ function initializeWebSocket(server) {
     });
   });
 
-  httpServer.listen(3002, () => {
-    console.log('Socket.IO server listening on port 3002');
+  httpServer.listen(5002, () => {
+    console.log('Socket.IO server listening on port 5002');
   });
 }
 
