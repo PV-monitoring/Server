@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const { APISignIn } = require("./api/token.js");
 const { _GetUserPlantList } = require("./api/functions.js");
-// const { initializeWebSocket } = require('./sockets/socketsHandler.js');
+const { initializeWebSocket } = require('./sockets/socketsHandler.js');
 const { insertDataIntoDatabase } = require('./database/getplants.js');
 
 const axios = require("axios");
@@ -15,29 +15,28 @@ const signupRouter = require("./routes/signup.js");
 const loginRouter = require("./routes/login.js");
 
 const app = express();
-// const server = http.createServer(app);
+const server = http.createServer(app);
+
 app.use(express.json());
 app.use(cors());
 app.use("/", signupRouter);
 app.use("/", loginRouter);
-
 
 const BaseURL= process.env.BaseURL
 const GetUserPlantList= process.env.GetUserPlantList
 const PORT = process.env.PORT || 3002;
 
 // Initialize WebSocket
-// initializeWebSocket(server);
+initializeWebSocket(server);
 
-app.listen(3002, () => {
-  console.log(`Server is running on port --> ${PORT}`);
-})
+// app.listen(3002, () => {
+//   console.log(`Server is running on port --> ${PORT}`);
+// })
 
 // Start the server
-// const PORT = process.env.PORT || 3002;
-// server.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 app.post("/", async (req, res) => {
   await APISignIn();

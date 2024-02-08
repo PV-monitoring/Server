@@ -21,7 +21,7 @@ async function _GetUserPlantList() {
   token = await getConfig();
   const _res = await axios.post(
     `${BaseURL}${GetUserPlantList}`,
-    { page_index: 1, page_size: 10 },
+    { page_index: 1, page_size: 100 },
     {
       headers: {
         token: token.token,
