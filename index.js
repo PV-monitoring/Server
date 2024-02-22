@@ -3,7 +3,7 @@ const http = require('http');
 const cors = require("cors");
 require("dotenv").config();
 const { APISignIn } = require("./api/token.js");
-const { _GetUserPlantList, getUserPlantDataById } = require("./api/functions.js");
+const { _GetUserPlantList, getInverterListByPlantId } = require("./api/functions.js");
 const { initializeWebSocket } = require('./sockets/socketsHandler.js');
 const { insertDataIntoDatabase } = require('./database/getplants.js');
 
@@ -68,10 +68,10 @@ app.get("/plants", async (req, res) => {
   }
 });
 
-app.get("/plantsdata", async (req, res) => {
+app.get("/invertersdata", async (req, res) => {
   try {
-    const _res = await getUserPlantDataById("20ea0232-0b26-43e2-833b-36fff0ac28a1");
-    res.json({ plants: _res.data });
+    const _res = await getInverterListByPlantId("682346ba-d594-4bd5-a734-433bd27dbc53");
+    res.json({ inverters: _res.data.data });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

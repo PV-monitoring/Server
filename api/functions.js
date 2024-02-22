@@ -7,6 +7,9 @@ const { APISignIn } = require("./token.js");
 const BaseURL = process.env.BaseURL;
 const GetUserPlantList = process.env.GetUserPlantList;
 const GetPlantDetail = process.env.GetPlantDetail;
+const GetPlantPower = process.env.GetPlantPower;
+const GetInventerList = process.env.GetInventerList;
+
 
 // Get config
 async function getConfig() {
@@ -45,11 +48,11 @@ async function _GetUserPlantList() {
 
 
 // Get User Plant Data by ID
-async function getUserPlantDataById(plantId) {
+async function getInverterListByPlantId(plantId) {
   token = await getConfig();
-  const response = await axios.get(
-    `${BaseURL}${GetPlantDetail}`,
-    { plantid: `${plantId}` },
+  const response = await axios.post(
+    `${BaseURL}${GetInventerList}`,
+    { Plantid: plantId },
     {
       headers: {
         token: token.token,
@@ -60,8 +63,8 @@ async function getUserPlantDataById(plantId) {
   if (response.data.code === 100002) {
     const _token = await APISignIn();
     const response = await axios.post(
-      `${BaseURL}${GetPlantDetail}`,
-      { plantid: `${plantId}` },
+      `${BaseURL}${GetInventerList}`,
+      { Plantid: plantId },
       {
         headers: {
           token: _token,
@@ -74,4 +77,4 @@ async function getUserPlantDataById(plantId) {
 }
 
 
-module.exports = { _GetUserPlantList, getUserPlantDataById };
+module.exports = { _GetUserPlantList, getInverterListByPlantId };

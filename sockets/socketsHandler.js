@@ -3,7 +3,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
-const GetUserPlantList = process.env.GetUserPlantList;
 
 function initializeWebSocket(server) {
   const httpServer = http.createServer(server);
@@ -26,7 +25,7 @@ function initializeWebSocket(server) {
       } catch (error) {
         console.error('Error updating data:', error.message);
       }
-    }, 1000);
+    }, 2000);
 
     socket.on('disconnect', () => {
       console.log('A client disconnected');
