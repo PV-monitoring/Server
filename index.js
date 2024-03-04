@@ -3,9 +3,9 @@ const http = require('http');
 const cors = require("cors");
 require("dotenv").config();
 const { APISignIn } = require("./api/token.js");
-const { _GetUserPlantList, getInverterListByPlantId } = require("./api/functions.js");
+const { _GetUserPlantList, getInverterListByPlantId, GetInverterData } = require("./api/functions.js");
 const { initializeWebSocket } = require('./sockets/socketsHandler.js');
-const { insertDataIntoDatabase } = require('./database/getplants.js');
+const { insertDataIntoDatabase } = require('./database/insertDataToDB.js');
 
 const axios = require("axios");
 const fs = require("fs");
@@ -58,15 +58,39 @@ app.get("/getplant", async (req, res) => {
 });
 
 
-app.get("/plants", async (req, res) => {
+// Periodically fetch and insert data into the database
+const intervalInMilliseconds = 1 * 1000; // 1 second
+setInterval(fetchAndInsertData, intervalInMilliseconds);
+
+// Function to fetch and insert data into the database
+async function fetchAndInsertData() {
   try {
-    const _res = await _GetUserPlantList();
-    res.json({ plants: _res.data.data.list });
+    // Fetch plant data from the API
+    const _res = await GetInverterData("5030KMTU221W0037");
+    // display the fetched data
+    // console.log("Fetched data:", _res.data.data);
+    // Insert the fetched data into the database
+    const table_name = "inverter_data";
+    const primary_key = "last_refresh_time";
+    await insertDataIntoDatabase(table_name, primary_key, _res.data.data);
+
+    // console.log(`Data inserted into the database at ${new Date()}`);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching and inserting data:', error.message);
   }
-});
+}
+
+
+
+// app.get("/plants", async (req, res) => {
+//   try {
+//     const _res = await _GetUserPlantList();
+//     res.json({ plants: _res.data.data.list });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 app.get("/invertersdata", async (req, res) => {
   try {

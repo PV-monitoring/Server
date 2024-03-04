@@ -9,6 +9,7 @@ const GetUserPlantList = process.env.GetUserPlantList;
 const GetPlantDetail = process.env.GetPlantDetail;
 const GetPlantPower = process.env.GetPlantPower;
 const GetInventerList = process.env.GetInventerList;
+const GetInverterBySN = process.env.GetInverterBySN;
 
 
 // Get config
@@ -77,4 +78,40 @@ async function getInverterListByPlantId(plantId) {
 }
 
 
-module.exports = { _GetUserPlantList, getInverterListByPlantId };
+// Get Inverter By SN
+async function GetInverterData(inverterSN) {
+  token = await getConfig();
+  const response = await axios.get(
+    `${BaseURL}${GetInverterBySN}`,
+    {
+      params: {
+        invertersn: inverterSN,
+      },
+      headers: {
+        token: token.token,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (response.data.code === 100002) {
+    const _token = await APISignIn();
+    const response = await axios.get(
+      `${BaseURL}${GetInverterBySN}`,
+      {
+        params: {
+          invertersn: inverterSN,
+        },
+        headers: {
+          token: _token.token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+  return response;
+}
+
+
+
+module.exports = { _GetUserPlantList, getInverterListByPlantId, GetInverterData };
