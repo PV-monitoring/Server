@@ -131,7 +131,7 @@ function monitorDatabase() {
         const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
         query.on('result', (row) => {
             // Handle new row insertion
-            console.log('New row inserted:', row);
+            // console.log('New row inserted:', row);
 
             // Execute Python script
             exec('Python main.py', (error, stdout, stderr) => {
