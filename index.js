@@ -59,7 +59,7 @@ app.get("/getplant", async (req, res) => {
 
 
 // Periodically fetch and insert data into the database
-const intervalInMilliseconds = 1 * 1000; // 1 second
+const intervalInMilliseconds = 2 * 1000; // 1 second
 setInterval(fetchAndInsertData, intervalInMilliseconds);
 
 // Function to fetch and insert data into the database
@@ -101,3 +101,67 @@ app.get("/invertersdata", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+const db = require('../Server/database/connection.js');
+const { exec } = require('child_process');
+
+function monitorDatabase() {
+    const connection = db;
+    
+
+    let lastId = 0; // Initialize lastId with a default value
+
+    // Function to get the last ID from the database
+    function getLastId(callback) {
+        const getLastIdQuery = connection.query('SELECT MAX(last_refresh_time) AS last_id FROM inverter_data');
+        getLastIdQuery.on('result', (row) => {
+            lastId = row.last_id || 0; // Update lastId with the last ID from the database or 0 if no rows exist
+            callback(lastId);
+            console.log(lastId);
+        });
+        getLastIdQuery.on('error', (err) => {
+            console.error('Error getting last ID:', err);
+        });
+    }
+
+    // Function to check for new rows periodically
+    function checkForChanges() {
+       // console.log(lastId);
+        // Query the database for new rows since the last known ID
+        const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
+        query.on('result', (row) => {
+            // Handle new row insertion
+            console.log('New row inserted:', row);
+
+            // Execute Python script
+            exec('Python main.py', (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error executing Python script: ${error}`);
+                    return;
+                }
+                console.log(`Python script output: ${stdout}`);
+            });
+        });
+
+        // Handle MySQL errors
+        connection.on('error', (err) => {
+            console.error('MySQL error:', err);
+        });
+    }
+
+    // Start monitoring
+    getLastId(() => {
+        // // Check for changes immediately
+        checkForChanges();
+
+        // Poll the database periodically for changes
+        // const intervalInMilliseconds = 10 * 1000; // 10 seconds
+        // setInterval(checkForChanges, intervalInMilliseconds);
+    });
+}
+
+monitorDatabase();
+
+
+
+
