@@ -35,7 +35,7 @@ initializeWebSocket(server);
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port --> ${PORT}`);
 });
 
 app.post("/", async (req, res) => {
@@ -59,7 +59,7 @@ app.get("/getplant", async (req, res) => {
 
 
 // Periodically fetch and insert data into the database
-const intervalInMilliseconds = 1 * 1000; // 1 second
+const intervalInMilliseconds = 30 * 1000; // 1 second
 setInterval(fetchAndInsertData, intervalInMilliseconds);
 
 // Function to fetch and insert data into the database
