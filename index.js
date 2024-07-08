@@ -63,18 +63,33 @@ const intervalInMilliseconds = 30 * 1000; // 1 second
 setInterval(fetchAndInsertData, intervalInMilliseconds);
 
 // Function to fetch and insert data into the database
+// Function to fetch and insert data into the database
 async function fetchAndInsertData() {
   try {
     // Fetch plant data from the API
     const _res = await GetInverterData("5030KMTU221W0037");
     // display the fetched data
-    // console.log("Fetched data:", _res.data.data);
+    //console.log("Fetched data:", _res.data.data);
     // Insert the fetched data into the database
     const table_name = "inverter_data";
     const primary_key = "last_refresh_time";
-    await insertDataIntoDatabase(table_name, primary_key, _res.data.data);
+    
+    // Function to remove the mppt field
+    const removeMpptField = (data) => {
+      if (Array.isArray(data)) {
+        return data.map(({ mppt, ...rest }) => rest);
+      } else {
+        const { mppt, ...rest } = data;
+        return rest;
+      }
+    };
 
-    // console.log(`Data inserted into the database at ${new Date()}`);
+    // Exclude the mppt field
+    const dataWithoutMppt = removeMpptField(_res.data.data);
+
+    //console.log("new data:",dataWithoutMppt);
+    await insertDataIntoDatabase(table_name, primary_key,dataWithoutMppt);
+    // console.log(Data inserted into the database at ${new Date()});
   } catch (error) {
     console.error('Error fetching and inserting data:', error.message);
   }
