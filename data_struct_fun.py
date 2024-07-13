@@ -1,6 +1,8 @@
 from db_connection import fetch_lastrow_data
 from db_connection import fetch_specific_row_data
 from db_connection import fetch_last_n_rows
+from db_connection import connect_to_database
+from db_connection import get_average_power_for_date
 import datetime
 import numpy as np
 
@@ -65,3 +67,20 @@ def pred_power_range(pre_date_time,under):
 def pre_15_val():
     data = fetch_last_n_rows(15,"Time")
     return data
+
+def get_average_power_last_30_days():
+    connection = connect_to_database()
+    if connection is None:
+        return None
+
+    cursor = connection.cursor()
+    today = datetime.date(2023, 7, 12)  # Correctly specify the date
+    average_powers = []
+
+    for i in range(20):
+        date = today - datetime.timedelta(days=i)
+        avg_power = get_average_power_for_date(date, cursor)
+        average_powers.append((date, avg_power))
+    
+    connection.close()
+    return average_powers

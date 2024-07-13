@@ -10,11 +10,12 @@ import numpy as np
 import datetime
 from state_machine import StateMachine
 import state_check
+import subprocess
+import sys
 
-
-# # Load the trained SOM model and scaler
+# Load the trained SOM model and scaler
 som = joblib.load('som_model.joblib')
-scaler1 =  joblib.load('scaler.joblib')
+scaler1 = joblib.load('scaler.joblib')
 
 # Create an instance of the Prediction class
 prediction_instance = Prediction(som, scaler1)
@@ -24,7 +25,6 @@ predicted_cluster = prediction_instance.predict_cluster(new_data)
 print(f"Predicted Cluster: {predicted_cluster}")
 
 data_struct.pred_cluster = predicted_cluster
-
 
 if __name__ == "__main__":
     # Create a StateMachine instance
@@ -50,11 +50,29 @@ if __name__ == "__main__":
 
     # Perform actions based on the new state
     machine.perform_action()  # Output: Performing shading action
-    
 
-row_data = (data_struct.lst_row[0], data_struct.lst_row[1], data_struct.lst_row[2], data_struct.pred_cluster,x)  # Specify the values for each column
+    # You can integrate other functions here as needed
+
+# Run the cleaning.py script
+row_data = (data_struct.lst_row[0], data_struct.lst_row[1], data_struct.lst_row[2], data_struct.pred_cluster, x)  # Specify the values for each column
 
 db_connection.save_row_to_database(row_data)
 print(predicted_cluster)
 print(x)
 
+    # # Check if scipy is installed
+    # try:
+    #     import scipy
+    # except ImportError:
+    #     print("scipy is not installed. Installing now...")
+    #     subprocess.check_call([sys.executable, "-m", "pip", "install", "scipy"])
+
+    # try:
+    #     result = subprocess.run(["python", "cleaning.py"], check=True, capture_output=True, text=True)
+    #     print("cleaning.py executed successfully")
+    #     print("Standard Output:", result.stdout)
+    #     print("Standard Error:", result.stderr)
+    # except subprocess.CalledProcessError as e:
+    #     print(f"Error occurred while executing cleaning.py: {e}")
+    #     print("Standard Output:", e.stdout)
+    #     print("Standard Error:", e.stderr)

@@ -139,30 +139,38 @@ function monitorDatabase() {
         });
     }
 
-    // Function to check for new rows periodically
     function checkForChanges() {
-       // console.log(lastId);
-        // Query the database for new rows since the last known ID
-        const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
-        query.on('result', (row) => {
-            // Handle new row insertion
-            console.log('New row inserted:', row);
-
-            // Execute Python script
-            exec('Python main.py', (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error executing Python script: ${error}`);
-                    return;
-                }
-                console.log(`Python script output: ${stdout}`);
-            });
-        });
-
-        // Handle MySQL errors
-        connection.on('error', (err) => {
-            console.error('MySQL error:', err);
-        });
-    }
+      // console.log(lastId);
+      // Query the database for new rows since the last known ID
+      const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
+      query.on('result', (row) => {
+          // Handle new row insertion
+          console.log('New row inserted:', row);
+  
+          // Execute main.py script
+          exec('python main.py', (error, stdout, stderr) => {
+              if (error) {
+                  console.error(`Error executing main.py: ${error}`);
+                  return;
+              }
+              console.log(`main.py output: ${stdout}`);
+  
+              // Execute cleaning.py script
+              exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
+                  if (cleanError) {
+                      console.error(`Error executing cleaning.py: ${cleanError}`);
+                      return;
+                  }
+                  console.log(`cleaning.py output: ${cleanStdout}`);
+              });
+          });
+      });
+  
+      // Handle MySQL errors
+      connection.on('error', (err) => {
+          console.error('MySQL error:', err);
+      });
+  }
 
     // Start monitoring
     getLastId(() => {
@@ -177,6 +185,28 @@ function monitorDatabase() {
 
 monitorDatabase();
 
+// function checkForChanges() {
+//   // console.log(lastId);
+//    // Query the database for new rows since the last known ID
+//    const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
+//    query.on('result', (row) => {
+//        // Handle new row insertion
+//        console.log('New row inserted:', row);
 
+//        // Execute Python script
+//        exec('Python main.py', (error, stdout, stderr) => {
+//            if (error) {
+//                console.error(Error executing Python script: ${error});
+//                return;
+//            }
+//            console.log(Python script output: ${stdout});
+//        });
+//    });
+
+//    // Handle MySQL errors
+//    connection.on('error', (err) => {
+//        console.error('MySQL error:', err);
+//    });
+// }
 
 

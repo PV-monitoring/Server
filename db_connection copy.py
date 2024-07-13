@@ -1,7 +1,6 @@
 import mysql.connector
 import numpy as np
 import datetime
-from datetime import datetime
 
 def connect_to_database():
     try:
@@ -112,31 +111,22 @@ def save_row_to_database(row_data):
     except mysql.connector.Error as error:
         print("Error saving row to the database:", error)
 
-import datetime
-
 def get_average_power_for_date(date, cursor):
-    formatted_date = date.strftime('%m.%d.%Y')  # Format date as mm.dd.yyyy
-    
+    formatted_date = date.strftime('%Y-%m-%d')
     query = """
-    SELECT `Power(W)`, STR_TO_DATE(Time, '%m.%d.%Y %H:%i:%s') AS formatted_time
-    FROM merged_file
+    SELECT pv_power 
+    FROM inverter_data 
+    WHERE DATE(last_refresh_time) = %s
     """
+    cursor.execute(query, (formatted_date,))
+    power_values = cursor.fetchall()
     
-    cursor.execute(query)
-    power_and_time_values = cursor.fetchall()
-    
-    # Filter power values based on formatted date
-    power_values_filtered = [value[0] for value in power_and_time_values if value[1] and value[1].strftime('%m.%d.%Y') == formatted_date]
-    
-    if power_values_filtered:
-        average_power = sum(power_values_filtered) / len(power_values_filtered)
+    if power_values:
+        average_power = sum(value[0] for value in power_values) / len(power_values)
     else:
         average_power = None
-
+    
     return average_power
-
-
-
 
 
 
