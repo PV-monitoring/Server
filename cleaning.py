@@ -54,15 +54,19 @@ optimal_power_loss_cost = power_loss_cost(optimal_cycle_interval, initial_power_
 print(f"Optimal Cleaning Cycle Interval: {optimal_cycle_interval} days")
 print(f"Power Loss Cost at Optimal Interval: ${optimal_power_loss_cost:.2f}")
 
+'''
 # Plot the power output graph and the fitted curve
 plt.figure(figsize=(10, 6))
 
 # Original power output data
 plt.plot(time, power_outputs, 'bo-', label='Power Output')
+'''
 
 # Fitted curve
 time_fit = np.linspace(min(time), max(time), 100)
 power_fit = exponential_decay(time_fit, P0, alpha)
+
+'''
 plt.plot(time_fit, power_fit, 'r-', label='Fitted Curve')
 
 plt.xlabel('Time (days since last cleaning)')
@@ -89,4 +93,4 @@ plt.title('Optimization of Cleaning Cycle Interval')
 plt.legend()
 plt.grid(True)
 plt.show()
-
+'''
