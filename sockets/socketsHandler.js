@@ -1,68 +1,62 @@
-const { _GetUserPlantList, getInverterListByPlantId, GetInverterData } = require("../api/functions.js");
-const { queryDatabase } = require("../database/dbFunctions.js");
-const http = require("http");
+const { _GetUserPlantList, getInverterListByPlantId, getInverterData } = require("../api/functions.js");
 const { Server } = require("socket.io");
-const cors = require("cors");
+require("dotenv").config();
 
 function initializeWebSocket(server) {
-  const httpServer = http.createServer(server);
-  const io = new Server(httpServer, {
+  const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5000", // client's origin
+      origin: process.env.CLIENT_URL,
       methods: ["GET", "POST"],
     },
   });
 
   io.on("connection", (socket) => {
-    console.log("A client connected");
+    console.log("A client connected", socket.id);
 
-    // Example: Send data to the client every second
-    const dataUpdateInterval = setInterval(async () => {
+    const sendPlantUpdates = async () => {
       try {
-        let idcount = 1; 
         const plants = await _GetUserPlantList();
+        // console.log(plants.data.data.list);
         socket.emit("plantsUpdate", plants.data.data.list);
-        
-        // Iterate over each plant and fetch data for each inverter
-        // Fetch plant IDs from the database
-        const plantsFromDatabase = await queryDatabase("SELECT plant_id FROM plants");
-
-        for (let row of plantsFromDatabase) {
-          console.log(`${idcount} --> ${row.plant_id}`);
-          idcount++;
-          // plant id --> row.plant_id
-          const inverterList = await getInverterListByPlantId(row.plant_id);
-          // Iterate over each inverter and fetch data
-          for (let inverterCount = 1; inverterCount < inverterList.data.data.total + 1; inverterCount++) {
-            console.log(inverterCount);
-            const inverterSN = inverterList.data.data.list.grid[inverterCount-1].invertersn;
-            console.log(inverterSN);
-            const inverterData = await GetInverterData(inverterSN);
-
-            // Emit the fetched data to connected clients using Socket.IO
-            // inverterList.data.data --> total & grid both
-            socket.emit("invertersUpdate", {
-              inverter_list: inverterList.data.data,
-              plantId: row.plant_id,
-              inverter_data: inverterData.data
-            });
-          }
-        }
-        console.log(`Data updated for all plants and inverters at ${new Date()}`);
-        // console.log(plants.data.data)
       } catch (error) {
         console.error("Error updating data:", error.message);
       }
-    }, 60000);
+    }
+
+    const plantUpdateInterval = setInterval(sendPlantUpdates, 30000);
+
+    socket.on("joinPlantRoom", async (plantId) => {
+      console.log(`Client joined room for plant ${plantId}`);
+      socket.join(plantId);
+
+      const sendInverterUpdates = async () => {
+        try {
+          const inverterList = await getInverterListByPlantId(plantId);
+          const inverterDataList = [];
+          for (let i = 1; i < inverterList.data.data.total + 1; i++) {
+            const inverterSN = inverterList.data.data.list.grid[i-1].invertersn;
+            const inverterData = await getInverterData(inverterSN);
+            inverterDataList.push(inverterData.data);
+          }
+          console.log(inverterDataList);
+          io.to(plantId).emit("invertersUpdate", inverterDataList);
+        } catch (error) {
+          console.error("Error updating data:", error.message);
+        }
+      }
+
+      const inverterUpdateInterval = setInterval(sendInverterUpdates, 60000);
+
+      socket.on("disconnect", () => {
+        console.log("A client disconnected", socket.id);
+        clearInterval(inverterUpdateInterval);
+      });
+    });
 
     socket.on("disconnect", () => {
-      console.log("A client disconnected");
-      clearInterval(dataUpdateInterval);
+      console.log("A client disconnected", socket.id);
+      clearInterval(plantUpdateInterval);
     });
-  });
-
-  httpServer.listen(5002, () => {
-    console.log("Socket.IO server listening on port --> 5002");
   });
 }
 

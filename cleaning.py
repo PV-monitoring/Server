@@ -21,8 +21,8 @@ popt, _ = curve_fit(exponential_decay, time, power_outputs, p0=initial_guess)
 
 # Extracting the fitted parameters
 P0, alpha = popt
-print(f"Initial Power Output (P0): {P0}")
-print(f"Dirt Accumulation Rate (alpha): {alpha}")
+# print(f"Initial Power Output (P0): {P0}")
+# print(f"Dirt Accumulation Rate (alpha): {alpha}")
 
 # Parameters
 initial_power_output = power_outputs[0]  # in watts
@@ -51,8 +51,8 @@ power_loss_costs = [power_loss_cost(interval, initial_power_output, dirt_accumul
 optimal_cycle_interval = cycle_intervals[np.argmin(np.abs(np.array(power_loss_costs) - cleaning_cost_per_cycle))]
 optimal_power_loss_cost = power_loss_cost(optimal_cycle_interval, initial_power_output, dirt_accumulation_rate, power_value_per_watt_per_day)
 
-print(f"Optimal Cleaning Cycle Interval: {optimal_cycle_interval} days")
-print(f"Power Loss Cost at Optimal Interval: ${optimal_power_loss_cost:.2f}")
+# print(f"Optimal Cleaning Cycle Interval: {optimal_cycle_interval} days")
+# print(f"Power Loss Cost at Optimal Interval: ${optimal_power_loss_cost:.2f}")
 
 '''
 # Plot the power output graph and the fitted curve

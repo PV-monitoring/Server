@@ -1,73 +1,46 @@
-// const express = require("express");
-// const cors = require("cors");
+const express = require("express");
+const http = require('http');
+const { Server } = require("socket.io");
+const cors = require("cors");
+const { initializeWebSocket } = require('./sockets/socketsHandler.js');
+require("dotenv").config();
 
-// const signupRouter = require("./routes/signup.js");
-// const loginRouter = require("./routes/login.js");
+const inverterRoutes = require('./routes/inverter.route');
 
-// const app = express();
-// app.use(express.json());
-// app.use(cors());
-// app.use("/", signupRouter);
-// app.use("/", loginRouter);
+const app = express();
+const server = http.createServer(app);
 
-// app.listen(3002, () => {
-//   console.log("Server is running .....");
-// });
+app.use(express.json());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST"],
+}));
+// middleware & static files
+app.use(express.urlencoded({ extended: true }));
 
-// require("dotenv").config();
-// const express = require("express");
-// const { SignIn } = require("./connect");
-// // const config = require("./config.json")
-// const axios = require("axios");
-// const fs = require("fs");
-// const path = require("path");
+initializeWebSocket(server);
 
-// const app = express();
+// set static file path for production build
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'));
+}
 
-// app.use(express.json());
+app.use((req, res, next) => {
+    res.locals.path = req.path;
+    next();
+});
 
-// app.post("/save", async (req, res) => {
-//   await SignIn();
-//   res.send("OK");
-// });
+//root path
+app.get('/', (req, res) => {
+    res.send("Welcome...!");
+});
 
-// app.get("/", async (req, res) => {
-//   try {
-//     const config = await fs.readFileSync(path.join(__dirname, "config.json"));
-//     const token = JSON.parse(config.toString());
+// API routes
+app.use('/inverter', inverterRoutes);
 
-//     const _res = await axios.post(
-//       "http://openapi.semsportal.com/api/OpenApi/GetUserPlantList",
-//       { page_index: 1, page_size: 10 },
-//       {
-//         headers: {
-//           token: token.token,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
+const PORT = process.env.PORT || 5001;
 
-//     if (_res.data.code === 100002) {
-//       const _token = await SignIn();
-//       const _res = await axios.post(
-//         "http://openapi.semsportal.com/api/OpenApi/GetUserPlantList",
-//         { page_index: 1, page_size: 10 },
-//         {
-//           headers: {
-//             token: _token,
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-//     }
-//     res.json({ mydata: _res.data });
-//     // res.json({mydata:config})
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ error: error });
-//   }
-// });
-
-// app.listen(3000, () => {
-//   console.log("Server Running");
-// });
+// Start the server
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

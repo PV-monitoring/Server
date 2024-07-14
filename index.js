@@ -67,7 +67,7 @@ setInterval(fetchAndInsertData, intervalInMilliseconds);
 async function fetchAndInsertData() {
   try {
     // Fetch plant data from the API
-    const _res = await GetInverterData("5030KMTU221W0037");
+    const _res = await GetInverterData("5036KMTU221W0223");
     // display the fetched data
     //console.log("Fetched data:", _res.data.data);
     // Insert the fetched data into the database
@@ -148,22 +148,22 @@ function monitorDatabase() {
           // console.log('New row inserted:', row);
   
           // Execute main.py script
-          exec('python main.py', (error, stdout, stderr) => {
-              if (error) {
-                  console.error(`Error executing main.py: ${error}`);
-                  return;
-              }
-              console.log(`main.py output: ${stdout}`);
+          // exec('python main.py', (error, stdout, stderr) => {
+          //     if (error) {
+          //         console.error(`Error executing main.py: ${error}`);
+          //         return;
+          //     }
+          //     console.log(`main.py output: ${stdout}`);
   
-              // Execute cleaning.py script
-              exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
-                  if (cleanError) {
-                      console.error(`Error executing cleaning.py: ${cleanError}`);
-                      return;
-                  }
-                  console.log(`cleaning.py output: ${cleanStdout}`);
-              });
-          });
+          //     // Execute cleaning.py script
+          //     exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
+          //         if (cleanError) {
+          //             console.error(`Error executing cleaning.py: ${cleanError}`);
+          //             return;
+          //         }
+          //         console.log(`cleaning.py output: ${cleanStdout}`);
+          //     });
+          // });
       });
   
       // Handle MySQL errors

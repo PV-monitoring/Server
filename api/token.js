@@ -23,24 +23,9 @@ let config = {
 }
 
 async function APISignIn() {
-    const res = await axios.request(config)
-    await fs.writeFileSync(path.join(__dirname,"config.json"),JSON.stringify({token:res.data.data.token}))
-    return res.data.data.token
+  const res = await axios.request(config)
+  fs.writeFileSync(path.join(__dirname, "config.json"), JSON.stringify({token:res.data.data.token}))
+  return res.data.data.token
 }
-
-// async function tokenCheck(EndPoint) {
-//   const _token = await APISignIn();
-//   const _res = await axios.post(
-//     `${BaseURL}${EndPoint}`,
-//     { page_index: 1, page_size: 10 },
-//     {
-//       headers: {
-//         token: _token,
-//         "Content-Type": "application/json",
-//       },
-//     }
-//   );
-//   return _res
-// }
 
 module.exports = { APISignIn }
