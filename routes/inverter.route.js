@@ -4,6 +4,6 @@ const inverterController = require('../controllers/inverter.controller');
 
 const router = express.Router();
 
-router.get('/getDetails', inverterController.getDetails);
+router.post('/getInverterListByPlantId', inverterController.getInverterListByPlantId);
 
 module.exports = router;

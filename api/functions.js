@@ -3,14 +3,13 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const { APISignIn } = require("./token.js");
-
-const BaseURL = process.env.BaseURL;
-const GetUserPlantList = process.env.GetUserPlantList;
-const GetPlantDetail = process.env.GetPlantDetail;
-const GetPlantPower = process.env.GetPlantPower;
-const GetInverterList = process.env.GetInverterList;
-const GetInverterBySN = process.env.GetInverterBySN;
-
+const { 
+  BASE_URL,
+  GET_USER_PLANT_LIST,
+  GET_INVERTER_LIST,
+  GET_INVERTER_BY_SN,
+  GET_PLANT_DETAIL,
+} = require("../utils/constants.js");
 
 // Get config
 function getConfig() {
@@ -19,12 +18,10 @@ function getConfig() {
 }
 
 // Get User Plant List
-async function _GetUserPlantList() {
+async function getUserPlantList() {
   try {
     let token = getConfig();
-    // console.log(token.token);
     let response = await getUserPlantListWithToken(token.token);
-    console.log(response.data);
 
     // If token is invalid, try refreshing it once
     if (response.data.code !== 0) {
@@ -46,7 +43,7 @@ async function _GetUserPlantList() {
 
 // Function to make the API request
 async function getUserPlantListWithToken(token) {
-  return axios.post(`${BaseURL}${GetUserPlantList}`, { page_index: 1, page_size: 100 }, {
+  return axios.post(`${BASE_URL}${GET_USER_PLANT_LIST}`, { page_index: 1, page_size: 100 }, {
     headers: {
       token: token,
       "Content-Type": "application/json",
@@ -54,6 +51,37 @@ async function getUserPlantListWithToken(token) {
   });
 }
 
+async function getPlantDetail(plantId) {
+  try {
+    let token = await getConfig();
+    let response = await getPlantDetailWithToken(plantId, token.token);
+
+    // If token is invalid, try refreshing it once
+    if (response.data.code !== 0) {
+      token = await APISignIn();
+      response = await getPlantDetailWithToken(plantId, token.token);
+    }
+
+    // If the token is still reported as invalid after refresh, throw an error
+    if (response.data.code !== 0) {
+      throw new Error("Token error after refresh");
+    }
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+async function getPlantDetailWithToken(plantId, token) {
+  return axios.get(`${BASE_URL}${GET_PLANT_DETAIL}?plantid=${plantId}`, {
+    headers: {
+      token: token,
+      "Content-Type": "application/json",
+    },
+  });
+}
 
 // Get User Plant Data by ID
 async function getInverterListByPlantId(plantId) {
@@ -75,13 +103,13 @@ async function getInverterListByPlantId(plantId) {
     return response;
   } catch (error) {
     console.error(error);
-    throw error; // Rethrow the error after logging it
+    throw error;
   }
 }
 
 // Function to make the API request
 async function getInverterListByPlantIdWithToken(token, plantId) {
-  return axios.post(`${BaseURL}${GetInverterList}`, { Plantid: plantId }, {
+  return axios.post(`${BASE_URL}${GET_INVERTER_LIST}`, { Plantid: plantId }, {
     headers: {
       token: token,
       "Content-Type": "application/json",
@@ -89,23 +117,24 @@ async function getInverterListByPlantIdWithToken(token, plantId) {
   });
 }
 
-
 // Get Inverter By SN
 async function getInverterData(inverterSN) {
   try {
     let token = await getConfig();
-    let response = await makeRequestWithToken(token.token, inverterSN);
+    let response = await getInverterDataWithToken(token.token, inverterSN);
 
     // If token is invalid, try refreshing it once
-    if (response.data.code === 100002) {
+    if (response.data.code !== 0) {
       token = await APISignIn();
-      response = await makeRequestWithToken(token.token, inverterSN);
+      response = await getInverterDataWithToken(token.token, inverterSN);
     }
 
     // If the token is still reported as invalid after refresh, throw an error
-    if (response.data.code === 100002) {
+    if (response.data.code !== 0) {
       throw new Error("Token error after refresh");
     }
+
+
 
     return response;
   } catch (error) {
@@ -115,8 +144,8 @@ async function getInverterData(inverterSN) {
 }
 
 // Function to make the API request
-async function makeRequestWithToken(token, inverterSN) {
-  return axios.get(`${BaseURL}${GetInverterBySN}`, {
+async function getInverterDataWithToken(token, inverterSN) {
+  return axios.get(`${BASE_URL}${GET_INVERTER_BY_SN}`, {
     params: {
       invertersn: inverterSN,
     },
@@ -130,7 +159,9 @@ async function makeRequestWithToken(token, inverterSN) {
 
 
 module.exports = { 
-  _GetUserPlantList, 
+  getConfig,
+  getUserPlantList, 
   getInverterListByPlantId, 
-  getInverterData 
+  getInverterData,
+  getPlantDetail
 };
