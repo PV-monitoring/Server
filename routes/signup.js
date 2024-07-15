@@ -8,7 +8,7 @@ signupRouter.post('/Register',(req, res) => {
     const sentUserName = req.body.userName
     const sentPassword = req.body.password
 
-    const SQL = 'INSERT INTO userregister (email,username,password) VALUES (?,?,?)'
+    const SQL = 'INSERT INTO userregister (userName,email,password) VALUES (?,?,?)'
 
     const Values = [sentEmail,sentUserName,sentPassword]
 
