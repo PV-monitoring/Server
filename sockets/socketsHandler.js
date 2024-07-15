@@ -74,7 +74,7 @@ function initializeWebSocket(server) {
       }
 
       // sendInverterUpdates();
-      const inverterUpdateInterval = setInterval(sendInverterUpdates, 10000);
+      const inverterUpdateInterval = setInterval(sendInverterUpdates, 30000);
 
       const sendStatus = async () => {
         try {
@@ -88,7 +88,7 @@ function initializeWebSocket(server) {
       }
 
       sendStatus();
-      const sendStatusUpdate = setInterval(sendStatus, 10000);
+      const sendStatusUpdate = setInterval(sendStatus, 30000);
 
       const sendCleaningCycleUpdate = async () => {
         try {
@@ -101,7 +101,7 @@ function initializeWebSocket(server) {
       }
 
       sendCleaningCycleUpdate();
-      const sendCleaningCycleUpdateInterval = setInterval(sendCleaningCycleUpdate, 10000);
+      const sendCleaningCycleUpdateInterval = setInterval(sendCleaningCycleUpdate, 30000);
 
       const sendPowerUpdate = async () => {
         try {
@@ -114,7 +114,7 @@ function initializeWebSocket(server) {
       }
 
       sendPowerUpdate();
-      const sendPowerUpdateInterval = setInterval(sendPowerUpdate, 10000);
+      const sendPowerUpdateInterval = setInterval(sendPowerUpdate, 30000);
 
       socket.on("disconnect", () => {
         console.log("A client disconnected", socket.id);
