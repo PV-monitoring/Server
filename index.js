@@ -120,19 +120,19 @@ app.get("/invertersdata", async (req, res) => {
 const db = require('./database/connection.js');
 const { exec } = require('child_process');
 
+
 function monitorDatabase() {
     const connection = db;
-    
 
-    let lastId = 0; // Initialize lastId with a default value
+    let lastId = null; // Initialize lastId with a default value
 
-    // Function to get the last ID from the database
+    // Function to get the last last_refresh_time from the database
     function getLastId(callback) {
         const getLastIdQuery = connection.query('SELECT MAX(last_refresh_time) AS last_id FROM inverter_data');
         getLastIdQuery.on('result', (row) => {
-            lastId = row.last_id || 0; // Update lastId with the last ID from the database or 0 if no rows exist
+            lastId = row.last_id || null; // Update lastId with the last ID from the database or null if no rows exist
             callback(lastId);
-            console.log(lastId);
+            console.log(`Initial last_refresh_time: ${lastId}`);
         });
         getLastIdQuery.on('error', (err) => {
             console.error('Error getting last ID:', err);
@@ -140,50 +140,67 @@ function monitorDatabase() {
     }
 
     function checkForChanges() {
-      // console.log(lastId);
-      // Query the database for new rows since the last known ID
-      const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%m:%s") > ?', [lastId]);
-      query.on('result', (row) => {
-          // Handle new row insertion
-          // console.log('New row inserted:', row);
-  
-          // Execute main.py script
-          exec('python main.py', (error, stdout, stderr) => {
-              if (error) {
-                  console.error(`Error executing main.py: ${error}`);
-                  return;
-              }
-              console.log(`main.py output: ${stdout}`);
-  
-              // Execute cleaning.py script
-              exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
-                  if (cleanError) {
-                      console.error(`Error executing cleaning.py: ${cleanError}`);
-                      return;
-                  }
-                  console.log(`cleaning.py output: ${cleanStdout}`);
-              });
-          });
-      });
-  
-      // Handle MySQL errors
-      connection.on('error', (err) => {
-          console.error('MySQL error:', err);
-      });
-  }
+        if (lastId === null) {
+            // If lastId is not set, it means there was no data initially
+            console.log('No initial data found.');
+            return;
+        }
+
+        // Query the database for new rows since the last known last_refresh_time
+        const query = connection.query('SELECT * FROM inverter_data WHERE STR_TO_DATE(last_refresh_time, "%Y-%m-%d %H:%i:%s") > ?', [lastId]);
+        query.on('result', (row) => {
+            // Handle new row insertion
+            console.log('New row inserted:', row);
+
+            // Update lastId to the latest row's last_refresh_time
+            lastId = row.last_refresh_time;
+
+            // Execute main.py script
+            exec('python main.py', (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error executing main.py: ${error}`);
+                    return;
+                }
+                console.log(`main.py output: ${stdout}`);
+
+                // Execute cleaning.py script
+                exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
+                    if (cleanError) {
+                        console.error(`Error executing cleaning.py: ${cleanError}`);
+                        return;
+                    }
+                    console.log(`cleaning.py output: ${cleanStdout}`);
+                });
+            });
+        });
+
+        query.on('error', (err) => {
+            console.error('Error querying new rows:', err);
+        });
+
+        query.on('end', () => {
+            console.log(`Updated last_refresh_time: ${lastId}`);
+        });
+
+        // Handle MySQL errors
+        connection.on('error', (err) => {
+            console.error('MySQL error:', err);
+        });
+    }
 
     // Start monitoring
     getLastId(() => {
-        // // Check for changes immediately
+        // Check for changes immediately
         checkForChanges();
 
         // Poll the database periodically for changes
-        // const intervalInMilliseconds = 10 * 1000; // 10 seconds
-        // setInterval(checkForChanges, intervalInMilliseconds);
+        const intervalInMilliseconds = 10 * 1000; // 10 seconds
+        setInterval(checkForChanges, intervalInMilliseconds);
     });
 }
 
 monitorDatabase();
+
 
 // function checkForChanges() {
 //   // console.log(lastId);
