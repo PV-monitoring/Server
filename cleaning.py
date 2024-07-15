@@ -4,10 +4,12 @@ from scipy.optimize import curve_fit
 from data_struct_fun import get_average_power_last_30_days
 
 # Example data
-time = np.array([0,1, 2, 3, 4, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20])  # days since last cleaning
+time = np.array([0,1, 2, 3, 4, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30])  # days since last cleaning
 power_values = get_average_power_last_30_days()
 power_outputs = [item[1] for item in power_values]
 power_outputs.reverse()
+print(power_outputs)
+
 
 # Exponential decay function for power loss
 def exponential_decay(t, P0, alpha):
@@ -76,6 +78,25 @@ plt.legend()
 plt.show()
 
 
+# # Plotting
+# plt.figure(figsize=(10, 6))
+
+# # Plot cleaning cost per cycle as a constant
+# plt.plot(cycle_intervals, [cleaning_cost_per_cycle] * len(cycle_intervals), label='Cleaning Cost per Cycle', color='b')
+
+# # Plot power loss cost
+# plt.plot(cycle_intervals, power_loss_costs, label='Power Loss Cost', color='g')
+# plt.scatter(optimal_cycle_interval, optimal_power_loss_cost, color='r', zorder=5, label='Optimal Point')
+# plt.axvline(x=optimal_cycle_interval, color='red', linestyle='--', linewidth=1)
+
+# plt.xlabel('Cleaning Cycle Interval (days)')
+# plt.ylabel('Cost (dollars)')
+# plt.title('Optimization of Cleaning Cycle Interval')
+# plt.legend()
+# plt.grid(True)
+# plt.show()
+# '''
+
 # Plotting
 plt.figure(figsize=(10, 6))
 
@@ -93,4 +114,3 @@ plt.title('Optimization of Cleaning Cycle Interval')
 plt.legend()
 plt.grid(True)
 plt.show()
-'''

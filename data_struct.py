@@ -7,8 +7,8 @@ import datetime
 
 
 #power clusters
-under = [9,7,14,11,10,15,5,13,0]
-normal = [3,2,1,6,15,11]
+under = [10,11,7,5,6,4,12,13,9]
+normal = [1,2,3,14,15,8,0]
 
 #pred_cluster
 pred_cluster = None

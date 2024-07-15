@@ -10,7 +10,7 @@ const inverterRoutes = require('./routes/inverter.route.js');
 const plantRoutes = require('./routes/plant.route.js');
 
 require("dotenv").config();
-// require("./services/python_exec.js").monitorDatabase();
+require("./services/python_exec.js").monitorDatabase();
 
 const app = express();
 const server = http.createServer(app);

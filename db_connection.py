@@ -119,7 +119,7 @@ def get_average_power_for_date(date, cursor):
     
     query = """
     SELECT `Power(W)`, STR_TO_DATE(Time, '%m.%d.%Y %H:%i:%s') AS formatted_time
-    FROM merged_file
+    FROM combined_2
     """
     
     cursor.execute(query)
@@ -127,6 +127,7 @@ def get_average_power_for_date(date, cursor):
     
     # Filter power values based on formatted date
     power_values_filtered = [value[0] for value in power_and_time_values if value[1] and value[1].strftime('%m.%d.%Y') == formatted_date]
+    # print(power_values_filtered)
     
     if power_values_filtered:
         average_power = sum(power_values_filtered) / len(power_values_filtered)

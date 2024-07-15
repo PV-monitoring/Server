@@ -18,10 +18,10 @@ const getCleaningCycleUpdate = async () => {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT 
-                DATE(ADDDATE(last_cleaning_date, INTERVAL days DAY)) AS estimated_date 
-            FROM cleaning 
-            ORDER BY time DESC 
-            LIMIT 1
+    DATE_ADD(STR_TO_DATE(last_cleaning_date, '%m/%d/%Y %H:%i'), INTERVAL days DAY) AS estimated_date 
+FROM cleaning 
+ORDER BY time DESC 
+LIMIT 1;
         `;
         db.query(query, (error, result) => {
             if (error) {
