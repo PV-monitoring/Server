@@ -5,4 +5,5 @@ This repo is for all Back-end works
 - myenv/Scripts/activate
 - npm install
 - pip install -r requirements.txt
+- add .env file to ./ and add config.json file with token to the ./api
 - npm run dev
