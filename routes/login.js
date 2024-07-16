@@ -3,7 +3,7 @@ const db = require('../database/connection.js')
 
 const loginRouter = express.Router()
 
-loginRouter.post('/Login', (req, res) => {
+loginRouter.post('/', (req, res) => {
     const sentloginUserName = req.body.LoginuserName
     const sentloginPassword = req.body.Loginpassword
 

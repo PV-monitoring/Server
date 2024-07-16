@@ -3,7 +3,7 @@ const db = require('../database/connection.js')
 
 const signupRouter = express.Router()
 
-signupRouter.post('/Register',(req, res) => {
+signupRouter.post('/',(req, res) => {
     const sentEmail = req.body.Email
     const sentUserName = req.body.userName
     const sentPassword = req.body.password

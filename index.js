@@ -9,6 +9,9 @@ const {
 const inverterRoutes = require('./routes/inverter.route.js');
 const plantRoutes = require('./routes/plant.route.js');
 
+const signupRouter = require("./routes/signup.js");
+const loginRouter = require("./routes/login.js");
+
 require("dotenv").config();
 require("./services/python_exec.js").monitorDatabase();
 
@@ -20,6 +23,11 @@ app.use(cors({
     origin: CLIENT_URL,
     methods: ["GET", "POST"],
 }));
+// signup and login routes
+
+app.use("/register", signupRouter);
+app.use("/login", loginRouter);
+
 // middleware & static files
 app.use(express.urlencoded({ extended: true }));
 
