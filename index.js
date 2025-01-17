@@ -69,7 +69,7 @@ async function fetchAndInsertData() {
     // Fetch plant data from the API
     const _res = await GetInverterData("5030KMTU221W0037");
     // display the fetched data
-    //console.log("Fetched data:", _res.data.data);
+    console.log("Fetched data:", _res.data.data);
     // Insert the fetched data into the database
     const table_name = "inverter_data";
     const primary_key = "last_refresh_time";
@@ -163,14 +163,14 @@ function monitorDatabase() {
                 }
                 console.log(`main.py output: ${stdout}`);
 
-                // Execute cleaning.py script
-                exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
-                    if (cleanError) {
-                        console.error(`Error executing cleaning.py: ${cleanError}`);
-                        return;
-                    }
-                    console.log(`cleaning.py output: ${cleanStdout}`);
-                });
+                // // Execute cleaning.py script
+                // exec('python cleaning.py', (cleanError, cleanStdout, cleanStderr) => {
+                //     if (cleanError) {
+                //         console.error(`Error executing cleaning.py: ${cleanError}`);
+                //         return;
+                //     }
+                //     console.log(`cleaning.py output: ${cleanStdout}`);
+                // });
             });
         });
 
